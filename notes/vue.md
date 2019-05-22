@@ -178,6 +178,7 @@ the element's contents, but also in attributes:
       framework: {
         name: 'Vue.js',
         url: 'https://vuejs.org'
+      }
     }
   });
 </script>
@@ -292,7 +293,7 @@ define certain portions of our template to skip based on JavaScript expressions.
       frameworks: [
         { id: 1, name: 'Vue.js', url: 'https://vuejs.org', include: true },
         { id: 2, name: 'React', url: 'https://reactjs.org/', include: true },
-        { id: 3, name: 'Angular', url: 'https://angular.io/' }
+        { id: 3, name: 'Angular', url: 'https://angular.io/', include: false }
       ]
     }
   });
