@@ -1232,3 +1232,152 @@ These techniques can be used in your own applications and components.  Also, now
 that you have a better understanding of how to build component based apps, you can
 start exploring using the many third-party Vue components that exist.  Whether you
 write it, or someone else does, the ideas are the same.
+
+
+## Search Bar 
+
+It is an optional augmentation, granted we mind minimal use case for the application.
+![Screencast of SearchBar in Action](screenshots/search-bar.gif)
+
+[Semantic-UI-Vue](https://github.com/Semantic-UI-Vue/Semantic-UI-Vue) is a [Semantic-UI](https://semantic-ui.com/) integration, while Semantic is a flexbox friendly UI framework designed for theming. It will bring about pretty elements for input field, loader and error-modal for `bridge-vue` application.
+
+### Implementation
+It is as simple as:
+- install dependencies
+- include the Semantic JS, CSS files
+- apply Semantic middleware to Vue engine
+- rework BridgeMenu component
+
+To install dependencies:
+```
+npm install semantic-ui-vue semantic-ui-css --save
+```
+
+Then, to make Vue understand Semantic's custom classes and elements, stylesheet and JS module files are imported into `main.js`:
+```
+import SuiVue from 'semantic-ui-vue';
+Vue.use(SuiVue);
+import 'semantic-ui-css/semantic.min.css';
+```
+
+<strong>Template markup</strong> of `BridgeMenu.vue` component is modified accordingly. 
+
+First, outer container `<div class='main'>` is now <em>classified</em>, instead of <em>identified</em>,  as `menu`, for the reason of CSS rules to be reused. 
+
+In this markup, conditional directives `v-if`, `v-else` replace `v-bind`ing of class-attributes (i.e. `active`) that Semantic uses for the sake of readability. 
+
+Lastly, when menu-items are being deployed into the listing, the source array is changed to a new stateful property `this.showBridges`, that is a filtered version of `this.bridges`. 
+
+```angular2html
+<template>
+    <div class="menu">
+        <!--Search Field-->
+        <div style="width:100%;" class="ui icon input">
+            <input placeholder="Name a bridge..." v-model="search" />
+            <i class="search icon"></i>
+        </div>
+        <div class="menu">
+            <!--Loader-->
+            <div v-if="status.loading" class="menu ui segment inverted">
+                <div class="ui active dimmer">
+                    <div class="ui text loader">Loading bridges...</div>
+                </div>
+            </div>
+            <!--Error Modal-->
+            <div v-if="status.errored">
+                <div class="ui warning message">
+                    <div class="header">
+                        Error: Data was not loaded.
+                    </div>
+                    Hint: Check API endpoint!
+                </div>
+            </div>
+            <!--BridgeListing-->
+            <div v-else>
+                <menu-item
+                        v-for="bridge of shownBridges" <!--filtered array-->
+                        :key="bridge.id"
+                        :bridge="bridge"
+                        @click="bridgeSelected"
+                />
+            </div>
+        </div>
+    </div>
+</template>
+```
+
+Small change to `<style>`, to suit multiple 'menu'-like elements:
+```angular2html
+<style scoped>
+    .menu {
+        height: 100%;
+    }
+</style>
+```
+
+En fin, under `<script>`, we need to declare 2 new variables to the state: `search` and `shownBridges`. Former will be synced (`v-model`) with SearchBar, while latter will be dynamically updated with filtered array of bridges. 
+
+To filter out `shownBridges`, `search` property will be <em>watched</em>, so that, whence new value is entered, the listing is rendered. <em>Notably</em>, original array stays in place, even more so, it is going to be automatically updated in case of fresh data downloaded from backend.
+
+```angular2html
+<script>
+    import MenuItem from './MenuItem.vue';
+    import getBridgeData from '../bridges.js';
+
+    export default {
+        name: 'BridgeMenu',
+        data: function() {
+            return {
+                status: {
+                    loading: false,
+                    errored: false
+                },
+                search: '',
+                bridges: [],
+                shownBridges: []
+            }
+        },
+        watch: {
+            bridges: function() {
+                // Whenever backend API updates
+                this.shownBridges = this.bridges;
+            },
+            search: function() {
+                this.shownBridges = this.bridges.filter(bridge =>
+                bridge.name.toLowerCase()
+                    .includes(this.search.toLowerCase()));
+            }
+        },
+        components: {
+            MenuItem
+        },
+        created: function() {
+            this.loadBridges();
+        },
+        methods: {
+            loadBridges: function() {
+                this.status.loading = true;
+
+                // Use our bridge.js function to talk to the REST API.
+                getBridgeData()
+                    .then(bridges => {
+                        this.status.loading = false;
+                        this.bridges = bridges;
+                    })
+                    .catch(err => {
+                        console.error('Unable to load bridge data', err.message);
+                        this.status.errored = true;
+                    });
+            },
+            bridgeSelected: function(bridge) {
+                // When the user clicks a menu item, emit a `change`
+                // event for the menu control, along with bridge value
+                this.$emit('change', bridge);
+            }
+        }
+    }
+</script>
+```
+
+### Augmentation Conclusion
+With these changes made to project's files, the project now features a pretty looking `SearchBar`!

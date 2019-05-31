@@ -1,6 +1,6 @@
 {
   "name": "bridge-vue",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -11,6 +11,8 @@
     "core-js": "^2.6.5",
     "he": "^1.2.0",
     "leaflet": "^1.5.1",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-vue": "^0.8.1",
     "vue": "^2.6.10"
   },
   "devDependencies": {
