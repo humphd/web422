@@ -1236,24 +1236,24 @@ write it, or someone else does, the ideas are the same.
 
 ## Search Bar 
 
-It is an optional augmentation, granted we mind minimal use case for the application.
+If you'd like to try a bit more, here's another feature we could add: a search input to filter our bridges.  Thanks to Seneca student Timofei Shchepkin (@fosteman) for adding this!
 ![Screencast of SearchBar in Action](screenshots/search-bar.gif)
 
-[Semantic-UI-Vue](https://github.com/Semantic-UI-Vue/Semantic-UI-Vue) is a [Semantic-UI](https://semantic-ui.com/) integration, while Semantic is a flexbox friendly UI framework designed for theming. It will bring about pretty elements for input field, loader and error-modal for `bridge-vue` application.
+In addition to extending our app, we'll also gain some experience working with third-party libraries.  Specifically, we'll use [Semantic-UI-Vue](https://github.com/Semantic-UI-Vue/Semantic-UI-Vue). It will bring about pretty elements for the input field, loader and error-modal.
 
 ### Implementation
-It is as simple as:
+Our change will involve the following steps:
 - install dependencies
 - include the Semantic JS, CSS files
-- apply Semantic middleware to Vue engine
-- rework BridgeMenu component
+- apply Semantic middleware to Vue
+- rework the `BridgeMenu` component
 
 To install dependencies:
 ```
 npm install semantic-ui-vue semantic-ui-css --save
 ```
 
-Then, to make Vue understand Semantic's custom classes and elements, stylesheet and JS module files are imported into `main.js`:
+Then, to make Vue understand Semantic's custom classes and elements, we'll import the necessary stylesheet and JS module files in `main.js`:
 ```
 import SuiVue from 'semantic-ui-vue';
 Vue.use(SuiVue);
@@ -1262,11 +1262,11 @@ import 'semantic-ui-css/semantic.min.css';
 
 <strong>Template markup</strong> of `BridgeMenu.vue` component is modified accordingly. 
 
-First, outer container `<div class='main'>` is now <em>classified</em>, instead of <em>identified</em>,  as `menu`, for the reason of CSS rules to be reused. 
+First, our outer container `<div class='main'>` now uses the `menu` CSS class instead of an `id`.
 
 In this markup, conditional directives `v-if`, `v-else` replace `v-bind`ing of class-attributes (i.e. `active`) that Semantic uses for the sake of readability. 
 
-Lastly, when menu-items are being deployed into the listing, the source array is changed to a new stateful property `this.showBridges`, that is a filtered version of `this.bridges`. 
+Lastly, in order to generate our `menu-item` components, we switch to using `this.showBridges`, which is a filtered version of `this.bridges`. 
 
 ```angular2html
 <template>
@@ -1315,7 +1315,7 @@ Small change to `<style>`, to suit multiple 'menu'-like elements:
 </style>
 ```
 
-En fin, under `<script>`, we need to declare 2 new variables to the state: `search` and `shownBridges`. Former will be synced (`v-model`) with SearchBar, while latter will be dynamically updated with filtered array of bridges. 
+In our `<script>` block, we need to declare two new `data` variables: `search` and `shownBridges`. The Former will be synced (`v-model`) with `SearchBar`, while latter will be dynamically updated with the filtered array of bridges.
 
 To filter out `shownBridges`, `search` property will be <em>watched</em>, so that, whence new value is entered, the listing is rendered. <em>Notably</em>, original array stays in place, even more so, it is going to be automatically updated in case of fresh data downloaded from backend.
 
