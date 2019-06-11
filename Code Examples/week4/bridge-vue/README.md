@@ -1295,7 +1295,7 @@ Lastly, in order to generate our `menu-item` components, we switch to using `thi
             <!--BridgeListing-->
             <div v-else>
                 <menu-item
-                        v-for="bridge of shownBridges" <!--filtered array-->
+                        v-for="bridge of filteredBridges" <!--filtered array-->
                         :key="bridge.id"
                         :bridge="bridge"
                         @click="bridgeSelected"
@@ -1315,9 +1315,9 @@ Small change to `<style>`, to suit multiple 'menu'-like elements:
 </style>
 ```
 
-In our `<script>` block, we need to declare two new `data` variables: `search` and `shownBridges`. The Former will be synced (`v-model`) with `SearchBar`, while latter will be dynamically updated with the filtered array of bridges.
+In our `<script>` block, we need to declare two new `data` variables: `search` and `filteredBridges`. The Former will be synced (`v-model`) with `SearchBar`, while latter will be dynamically updated with the filtered array of bridges.
 
-To filter out `shownBridges`, `search` property will be <em>watched</em>, so that, whence new value is entered, the listing is rendered. <em>Notably</em>, original array stays in place, even more so, it is going to be automatically updated in case of fresh data downloaded from backend.
+To filter out `filteredBridges`, `search` property will be <em>watched</em>, so that, whence new value is entered, the listing is rendered. <em>Notably</em>, original array stays in place, even more so, it is going to be automatically updated in case of fresh data downloaded from backend.
 
 ```angular2html
 <script>
@@ -1334,16 +1334,16 @@ To filter out `shownBridges`, `search` property will be <em>watched</em>, so tha
                 },
                 search: '',
                 bridges: [],
-                shownBridges: []
+                filteredBridges: []
             }
         },
         watch: {
             bridges: function() {
                 // Whenever backend API updates
-                this.shownBridges = this.bridges;
+                this.filteredBridges = this.bridges;
             },
             search: function() {
-                this.shownBridges = this.bridges.filter(bridge =>
+                this.filteredBridges = this.bridges.filter(bridge =>
                 bridge.name.toLowerCase()
                     .includes(this.search.toLowerCase()));
             }

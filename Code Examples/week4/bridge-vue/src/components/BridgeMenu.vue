@@ -24,7 +24,7 @@
             <!--BridgeListing-->
             <div v-else>
                 <menu-item
-                        v-for="bridge of shownBridges"
+                        v-for="bridge of filteredBridges"
                         :key="bridge.id"
                         :bridge="bridge"
                         @click="bridgeSelected"
@@ -52,16 +52,16 @@
                 },
                 search: '',
                 bridges: [],
-                shownBridges: []
+                filteredBridges: []
             }
         },
         watch: {
             bridges: function() {
                 // Whenever backend API updates
-                this.shownBridges = this.bridges;
+                this.filteredBridges = this.bridges;
             },
             search: function() {
-                this.shownBridges = this.bridges.filter(bridge =>
+                this.filteredBridges = this.bridges.filter(bridge =>
                 bridge.name.toLowerCase()
                     .includes(this.search.toLowerCase()));
             }
@@ -75,7 +75,6 @@
         methods: {
             loadBridges: function() {
                 this.status.loading = true;
-
                 // Use our bridge.js function to talk to the REST API.
                 getBridgeData()
                     .then(bridges => {
