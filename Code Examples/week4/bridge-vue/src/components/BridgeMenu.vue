@@ -51,19 +51,14 @@
                     errored: false
                 },
                 search: '',
-                bridges: [],
-                filteredBridges: []
+                bridges: []
             }
         },
-        watch: {
-            bridges: function() {
-                // Whenever backend API updates
-                this.filteredBridges = this.bridges;
-            },
-            search: function() {
-                this.filteredBridges = this.bridges.filter(bridge =>
-                bridge.name.toLowerCase()
-                    .includes(this.search.toLowerCase()));
+        computed: {
+            filteredBridges: function() {
+                return this.bridges.filter(bridge =>
+                    bridge.name.toLowerCase()
+                        .includes(this.search.toLowerCase()));
             }
         },
         components: {
