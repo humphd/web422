@@ -1295,7 +1295,7 @@ Lastly, in order to generate our `menu-item` components, we switch to using `thi
             <!--BridgeListing-->
             <div v-else>
                 <menu-item
-                        v-for="bridge of filteredBridges" <!--filtered array-->
+                        v-for="bridge of filteredBridges"
                         :key="bridge.id"
                         :bridge="bridge"
                         @click="bridgeSelected"
@@ -1315,69 +1315,66 @@ Small change to `<style>`, to suit multiple 'menu'-like elements:
 </style>
 ```
 
-In our `<script>` block, we need to declare two new `data` variables: `search` and `filteredBridges`. The Former will be synced (`v-model`) with `SearchBar`, while latter will be dynamically updated with the filtered array of bridges.
+In our `<script>` block, we need to declare two new objects in the view model
+ - `data`:`search` 
+ - `computed`:`filteredBridges`
+ 
+ The Former will be synced (`v-model`) with `SearchBar`, while latter will dynamically filter and re-render list of bridges.
 
-To filter out `filteredBridges`, `search` property will be <em>watched</em>, so that, whence new value is entered, the listing is rendered. <em>Notably</em>, original array stays in place, even more so, it is going to be automatically updated in case of fresh data downloaded from backend.
+To compute `filteredBridges` and supply return value to (`v-for`) binding in _BridgeListing_, Vue engine will create a dependency of `search`, `bridges` data properties, thereby whence new value is entered, the _BridgeListing_ is updated. 
 
-```angular2html
+<em>Notably</em>, original `bridge` array stays in place untouched, even more so, it is going to be automatically updated in case of fresh data downloaded from backend.
+
+```vue
 <script>
-    import MenuItem from './MenuItem.vue';
-    import getBridgeData from '../bridges.js';
+import MenuItem from './MenuItem.vue';
+import getBridgeData from '../bridges.js';
 
-    export default {
-        name: 'BridgeMenu',
-        data: function() {
-            return {
-                status: {
-                    loading: false,
-                    errored: false
-                },
-                search: '',
-                bridges: [],
-                filteredBridges: []
-            }
-        },
-        watch: {
-            bridges: function() {
-                // Whenever backend API updates
-                this.filteredBridges = this.bridges;
+export default {
+    name: 'BridgeMenu',
+    data: function() {
+        return {
+            status: {
+                loading: false,
+                errored: false
             },
-            search: function() {
-                this.filteredBridges = this.bridges.filter(bridge =>
+            search: '',
+            bridges: []
+        }
+    },
+    computed: {
+        filteredBridges: function() {
+            return this.bridges.filter(bridge =>
                 bridge.name.toLowerCase()
                     .includes(this.search.toLowerCase()));
-            }
-        },
-        components: {
-            MenuItem
-        },
-        created: function() {
-            this.loadBridges();
-        },
-        methods: {
-            loadBridges: function() {
-                this.status.loading = true;
-
-                // Use our bridge.js function to talk to the REST API.
-                getBridgeData()
-                    .then(bridges => {
-                        this.status.loading = false;
-                        this.bridges = bridges;
-                    })
-                    .catch(err => {
-                        console.error('Unable to load bridge data', err.message);
-                        this.status.errored = true;
-                    });
-            },
-            bridgeSelected: function(bridge) {
-                // When the user clicks a menu item, emit a `change`
-                // event for the menu control, along with bridge value
-                this.$emit('change', bridge);
-            }
         }
-    }
+    },
+    components: {
+        MenuItem
+    },
+    created: function() {
+        this.loadBridges();
+    },
+    methods: {
+        loadBridges: function() {
+            this.status.loading = true;
+            // Use our bridge.js function to talk to the REST API.
+            getBridgeData()
+                .then(bridges => {
+                    this.status.loading = false;
+                    this.bridges = bridges;
+                })
+                .catch(err => {
+                    console.error('Unable to load bridge data', err.message);
+                    this.status.errored = true;
+                });
+        },
+        bridgeSelected: function(bridge) {
+            // When the user clicks a menu item, emit a `change`
+            // event for the menu control, along with bridge value
+            this.$emit('change', bridge);
+        }}}
 </script>
 ```
 
-### Augmentation Conclusion
-With these changes made to project's files, the project now features a pretty looking `SearchBar`!
+##### With these changes made to project's files, the project now features a pretty looking `SearchBar`!
