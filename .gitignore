@@ -1,2 +1,8 @@
 **/node_modules
 **/package-lock.json
+.idea/encodings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/web422-sictweb-humph-fork.iml
+.idea/workspace.xml
